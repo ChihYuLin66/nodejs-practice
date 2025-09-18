@@ -1,0 +1,15 @@
+{
+  "name": "nodejs-practice",
+  "version": "1.0.0",
+  "description": "Node.js 練習專案",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "server": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongodb": "^6.0.0"
+  }
+}
