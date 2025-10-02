@@ -1,48 +1,43 @@
-const express = require('express');
-const { MongoClient } = require('mongodb');
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 
-const app = express();
-const port = 3000;
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var todosRouter = require('./routes/todo');
 
-const uri = 'mongodb://admin:secret@my-mongodb:27017/app?authSource=admin';
-const client = new MongoClient(uri);
+var app = express();
 
-app.get('/', async (req, res) => {
-  try {
-    await client.connect();
-    const db = client.db('app');
-    const collection = db.collection('test');
-    
-    const data = await collection.find({}).toArray();
-    
-    res.send(`
-      <h1>Node.js + Express + MongoDB</h1>
-      <p>連接成功！</p>
-      <h2>資料庫內容：</h2>
-      <pre>${JSON.stringify(data, null, 2)}</pre>
-    `);
-  } catch (error) {
-    res.send(`<h1>錯誤</h1><p>${error.message}</p>`);
-  }
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/todo', todosRouter);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
 });
 
-app.get('/add', async (req, res) => {
-  try {
-    await client.connect();
-    const db = client.db('app');
-    const collection = db.collection('test');
-    
-    await collection.insertOne({
-      message: `新增資料 ${new Date().toLocaleString()}`,
-      timestamp: new Date()
-    });
-    
-    res.redirect('/');
-  } catch (error) {
-    res.send(`<h1>錯誤</h1><p>${error.message}</p>`);
-  }
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`伺服器運行在 http://localhost:${port}`);
-});
+module.exports = app;
