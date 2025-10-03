@@ -11,7 +11,7 @@ async function connect() {
     await client.connect();
     console.log('MongoDB 連接成功');
     
-    const db = client.db('app');
+    const db = client.db('nodejs-practice');
     const collection = db.collection('test');
     
     // 插入測試資料

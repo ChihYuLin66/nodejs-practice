@@ -1,1 +1,32 @@
-aaaasdasdfwe
+
+<input type="text" id="newTask" placeholder="新增任務">
+<button onclick="addTask()">新增</button>
+
+
+<ul id="taskList">
+<% tasks.forEach(item => { %>
+    <li data-id="<%= item._id %>">
+        <%= item.title %>
+        <button onclick="deleteTask('<%= item._id %>')">刪除</button>
+    </li>
+<% }) %>
+</ul>
+
+
+<script>
+async function addTask() {
+    const title = document.getElementById('newTask').value;
+    if (!title) return
+    const response = await fetch('/todo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title})
+    });
+    location.reload(); // 簡單重新載入
+}
+
+async function deleteTask(id) {
+    await fetch(`/todo/${id}`, {method: 'DELETE'});
+    location.reload();
+}
+</script>
